@@ -34,11 +34,22 @@ export class UserService {
         
      async show(id: number) {
 
+        if(!(await this.prisma.user.count({where: {id}}))) {
+            throw new NotFoundException(`User ${id} not found`);
+            
+        }
+
         return await this.prisma.user.findUnique({where: {id}});
      }
 
      async update(id: number, {email, name, password}: UpdatePutUserDTO) {
         console.log({email, name, password}); 
+
+        if (!(await this.show(id))) {
+            throw new NotFoundException(`User ${id} not found`);
+            return;
+            
+        }
 
         return this.prisma.user.update({
             data: {
